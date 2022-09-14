@@ -20,21 +20,21 @@ export const Shaders = (li: LightInputs) => {
     li.isPhong = li.isPhong == undefined ? '0' : li.isPhong;
 
     const vertex = `
-        [[block]] struct Uniforms {
-            viewProjectionMatrix : mat4x4<f32>;
-            modelMatrix : mat4x4<f32>;               
-            normalMatrix : mat4x4<f32>;            
+        struct Uniforms {
+            viewProjectionMatrix : mat4x4<f32>,
+            modelMatrix : mat4x4<f32>,               
+            normalMatrix : mat4x4<f32>,            
         };
-        [[binding(0), group(0)]] var<uniform> uniforms : Uniforms;
+        @binding(0) @group(0) var<uniform> uniforms : Uniforms;
 
         struct Output {
-            [[builtin(position)]] Position : vec4<f32>;
-            [[location(0)]] vPosition : vec4<f32>;
-            [[location(1)]] vNormal : vec4<f32>;
+            @builtin(position) Position : vec4<f32>,
+            @location(0) vPosition : vec4<f32>,
+            @location(1) vNormal : vec4<f32>,
         };
 
-        [[stage(vertex)]]
-        fn main([[location(0)]] position: vec4<f32>, [[location(1)]] normal: vec4<f32>) -> Output {    
+        @vertex
+        fn main(@location(0) position: vec4<f32>, @location(1) normal: vec4<f32>) -> Output {    
             var output: Output;            
             let mPosition:vec4<f32> = uniforms.modelMatrix * position; 
             output.vPosition = mPosition;                  
@@ -44,14 +44,14 @@ export const Shaders = (li: LightInputs) => {
         }`;
 
     const fragment = `
-        [[block]] struct Uniforms {
-            lightPosition : vec4<f32>;   
-            eyePosition : vec4<f32>;
+        struct Uniforms {
+            lightPosition : vec4<f32>,   
+            eyePosition : vec4<f32>,
         };
-        [[binding(1), group(0)]] var<uniform> uniforms : Uniforms;
+        @binding(1) @group(0) var<uniform> uniforms : Uniforms;
 
-        [[stage(fragment)]]
-        fn main([[location(0)]] vPosition: vec4<f32>, [[location(1)]] vNormal: vec4<f32>) ->  [[location(0)]] vec4<f32> {
+        @fragment
+        fn main(@location(0) vPosition: vec4<f32>, @location(1) vNormal: vec4<f32>) -> @location(0) vec4<f32> {
             let N:vec3<f32> = normalize(vNormal.xyz);                
             let L:vec3<f32> = normalize(uniforms.lightPosition.xyz - vPosition.xyz);     
             let V:vec3<f32> = normalize(uniforms.eyePosition.xyz - vPosition.xyz);          
